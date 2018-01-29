@@ -8,6 +8,7 @@ public class MaxHeap<T extends Comparable<? super T>> implements MaxHeapInterfac
   private int lastIndex;
   private static final int DEFAULT_CAPACITY = 25;
   private static final int MAX_CAPACITY = 10000;
+  private int numSwaps;
 
   public MaxHeap() {
     this(DEFAULT_CAPACITY);
@@ -23,6 +24,7 @@ public class MaxHeap<T extends Comparable<? super T>> implements MaxHeapInterfac
     T[] tempHeap = (T[]) new Comparable[size + 1];
     heap = tempHeap;
     lastIndex = 0;
+    numSwaps = 0;
   }
 
   public MaxHeap(T[] entries) {
@@ -30,6 +32,7 @@ public class MaxHeap<T extends Comparable<? super T>> implements MaxHeapInterfac
     for (int index = 0; index < entries.length; index++) {
       heap[index + 1] = entries[index];
     }
+    lastIndex = entries.length;
     for (int rootIndex = lastIndex / 2; rootIndex > 0; rootIndex--) {
       reheap(rootIndex);
     }
@@ -42,6 +45,7 @@ public class MaxHeap<T extends Comparable<? super T>> implements MaxHeapInterfac
       heap[newIndex] = heap[parentIndex];
       newIndex = parentIndex;
       parentIndex = parentIndex / 2;
+      numSwaps++;
     }
     heap[newIndex] = newEntry;
     lastIndex++;
@@ -60,12 +64,15 @@ public class MaxHeap<T extends Comparable<? super T>> implements MaxHeapInterfac
   }
 
   public T removeMax() {
-    if (isEmpty())
+    if (isEmpty()){
+      System.out.println("empty!!");
       return null;
+    }
 
     T root = heap[1];
     heap[1] = heap[lastIndex];
     lastIndex--;
+    numSwaps++;
     reheap(1);
 
     return root;
@@ -95,7 +102,7 @@ public class MaxHeap<T extends Comparable<? super T>> implements MaxHeapInterfac
     boolean done = false;
     T orphan = heap[rootIndex];
     int leftChildIndex = 2 * rootIndex;
-    while (!done && (leftChildIndex <= rootIndex)) {
+    while (!done && (leftChildIndex <= lastIndex)) {
       int largerChildIndex = leftChildIndex;
       int rightChildIndex = leftChildIndex + 1;
       if ((rightChildIndex <= lastIndex) && heap[rightChildIndex].compareTo(heap[largerChildIndex]) > 0) {
@@ -103,12 +110,14 @@ public class MaxHeap<T extends Comparable<? super T>> implements MaxHeapInterfac
       }
       if (orphan.compareTo(heap[largerChildIndex]) < 0) {
         heap[rootIndex] = heap[largerChildIndex];
+        numSwaps++;
         rootIndex = largerChildIndex;
         leftChildIndex = 2 * rootIndex;
       } else {
         done = true;
       }
       heap[rootIndex] = orphan;
+
     }
   }
 
@@ -135,12 +144,13 @@ public class MaxHeap<T extends Comparable<? super T>> implements MaxHeapInterfac
 
   public String toString() {
     String str = "";
-    for (int i = 1; (i < 10 || i < heap.length); i++) {
+    for (int i = 1; i < heap.length; i++) {
       str += heap[i];
       str += ",";
     }
-    str.substring(0, str.length() - 1);
-    str += "...";
     return str;
+  }
+  public int getNumSwaps() {
+    return numSwaps;
   }
 }
